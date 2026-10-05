@@ -8,6 +8,7 @@ export interface Question {
   text: string
   choices: Choice[]
   correctChoiceId: string
+  explanation: string
 }
 
 export interface Quiz {
