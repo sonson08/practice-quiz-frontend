@@ -436,7 +436,8 @@ button {
 
 .notes-input {
   width: 100%;
-  min-height: 180px;
+  flex: 1;
+  min-height: 240px;
   padding: 0.85rem 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -459,63 +460,10 @@ button {
 }
 
 .notes-counter {
-  margin-top: 0.4rem;
+  margin: 0.4rem 0 1rem;
   color: var(--text-subtle);
   font-size: 0.75rem;
   text-align: right;
-}
-
-.length-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.75rem;
-  margin: 0.75rem 0 1.25rem;
-  padding: 0;
-  border: none;
-}
-
-.length-options legend {
-  width: 100%;
-  margin-bottom: 0.75rem;
-  padding: 0;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.radio {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.radio input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.radio-mark {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #cbd5e1;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.radio input:checked + .radio-mark {
-  border-color: var(--primary);
-  border-width: 5px;
-}
-
-.radio input:focus-visible + .radio-mark {
-  box-shadow: 0 0 0 3px var(--primary-soft);
-}
-
-.radio-hint {
-  color: var(--text-muted);
 }
 
 .form-error {
@@ -1168,10 +1116,6 @@ button {
   }
 
   .notes-input {
-    min-height: 140px;
-  }
-
-  .length-options {
-    flex-direction: column;
+    min-height: 160px;
   }
 }

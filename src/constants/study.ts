@@ -1,4 +1,4 @@
-export const MAX_NOTES_LENGTH = 10_000
+export const MAX_NOTES_LENGTH = 20_000
 
 export const QUIZ_QUESTION_COUNT = 5
 

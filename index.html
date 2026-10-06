@@ -4,9 +4,126 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Practice Quiz</title>
+    <meta name="description" content="Paste your notes, and let AI create a summary and quiz for you." />
+    <meta name="theme-color" content="#2563eb" />
+    <title>AI Study Buddy</title>
+    <style>
+      #preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        background: #f5f7fb;
+        font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+        transition:
+          opacity 0.4s ease,
+          visibility 0.4s ease;
+      }
+
+      #preloader.preloader-hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .preloader-icon {
+        display: grid;
+        place-items: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 22px;
+        background: #2563eb;
+        color: #fff;
+        box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
+        animation: preloader-bounce 1.4s ease-in-out infinite;
+      }
+
+      .preloader-title {
+        margin: 0.5rem 0 0;
+        color: #0f172a;
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+
+      .preloader-tagline {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.9rem;
+      }
+
+      .preloader-bar {
+        position: relative;
+        width: 140px;
+        height: 4px;
+        margin-top: 0.75rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #dbe5fb;
+      }
+
+      .preloader-bar::after {
+        content: '';
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 40%;
+        border-radius: inherit;
+        background: #2563eb;
+        animation: preloader-slide 1.1s ease-in-out infinite;
+      }
+
+      @keyframes preloader-bounce {
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      @keyframes preloader-slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(250%);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .preloader-icon,
+        .preloader-bar::after {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="preloader" role="status" aria-label="Loading AI Study Buddy">
+      <div class="preloader-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="44"
+          height="44"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"
+          />
+          <path d="M22 10v6" />
+          <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
+        </svg>
+      </div>
+      <p class="preloader-title">AI Study Buddy</p>
+      <p class="preloader-tagline">Turn your notes into a summary and quiz</p>
+      <div class="preloader-bar" aria-hidden="true"></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

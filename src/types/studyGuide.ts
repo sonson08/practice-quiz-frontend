@@ -1,7 +1,5 @@
 import type { Question } from '@/types/quiz'
 
-export type SummaryLength = 'short' | 'detailed'
-
 export interface StudyGuide {
   summary: string[]
   keyConcepts: string[]

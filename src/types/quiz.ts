@@ -10,10 +10,3 @@ export interface Question {
   correctChoiceId: string
   explanation: string
 }
-
-export interface Quiz {
-  id: string
-  title: string
-  description?: string
-  questions: Question[]
-}

@@ -4,13 +4,13 @@ import {
   type StudySessionContextValue,
   type StudySessionState,
 } from '@/context/studySessionContext'
+import { toApiError } from '@/api/apiError'
 import { generateStudyGuide } from '@/services/studyGuideService'
-import type { StudyGuide, SummaryLength } from '@/types/studyGuide'
+import type { StudyGuide } from '@/types/studyGuide'
 import { saveSessionRecord } from '@/utils/sessionHistory'
 
 type Action =
   | { type: 'setNotes'; notes: string }
-  | { type: 'setSummaryLength'; length: SummaryLength }
   | { type: 'generateStart' }
   | { type: 'generateProgress'; step: number }
   | { type: 'generateSuccess'; guide: StudyGuide }
@@ -23,7 +23,6 @@ type Action =
 
 const initialState: StudySessionState = {
   notes: '',
-  summaryLength: 'detailed',
   status: 'idle',
   loadingStep: 0,
   guide: null,
@@ -45,8 +44,6 @@ function reducer(state: StudySessionState, action: Action): StudySessionState {
   switch (action.type) {
     case 'setNotes':
       return { ...state, notes: action.notes }
-    case 'setSummaryLength':
-      return { ...state, summaryLength: action.length }
     case 'generateStart':
       return { ...state, ...quizReset, status: 'loading', loadingStep: 0, guide: null, error: null }
     case 'generateProgress':
@@ -102,16 +99,16 @@ export function StudySessionProvider({ children }: { children: ReactNode }) {
     const id = ++requestId.current
     dispatch({ type: 'generateStart' })
     try {
-      const guide = await generateStudyGuide(state.notes, state.summaryLength, (step) => {
+      const guide = await generateStudyGuide(state.notes, (step) => {
         if (id === requestId.current) dispatch({ type: 'generateProgress', step })
       })
       if (id === requestId.current) dispatch({ type: 'generateSuccess', guide })
-    } catch {
+    } catch (error) {
       if (id === requestId.current) {
-        dispatch({ type: 'generateError', error: 'Something went wrong while generating. Please try again.' })
+        dispatch({ type: 'generateError', error: toApiError(error).message })
       }
     }
-  }, [state.notes, state.summaryLength])
+  }, [state.notes])
 
   const nextQuestion = useCallback(() => {
     const total = state.guide?.questions.length ?? 0
@@ -137,7 +134,6 @@ export function StudySessionProvider({ children }: { children: ReactNode }) {
       ...state,
       currentStep: getCurrentStep(state),
       setNotes: (notes) => dispatch({ type: 'setNotes', notes }),
-      setSummaryLength: (length) => dispatch({ type: 'setSummaryLength', length }),
       generate,
       selectChoice: (choiceId) => dispatch({ type: 'selectChoice', choiceId }),
       submitAnswer: () => dispatch({ type: 'submitAnswer' }),
