@@ -2,10 +2,11 @@
 // Implements the contract in the backend's docs/API.md so the frontend can be tested without
 // Docker, PostgreSQL, or AWS credentials.
 //
-//   npm run mock:api                     all endpoints
-//   npm run mock:api -- --summaries-only  mimic the backend today (no /quizzes, no /health)
+//   npm run mock:api                     summaries and quizzes (matches the backend today)
+//   npm run mock:api -- --summaries-only  no /quizzes endpoint
 //
-// Put "[llm-error]" anywhere in the notes to simulate a 502 LLM_ERROR.
+// Put "[llm-error]" in the notes to make both endpoints return 502 LLM_ERROR,
+// or "[quiz-error]" to make only /quizzes fail.
 
 import http from 'node:http'
 
@@ -106,8 +107,6 @@ const server = http.createServer(async (req, res) => {
   const route = `${req.method} ${url.pathname.replace(/\/$/, '')}`
   console.log(new Date().toLocaleTimeString(), route)
 
-  if (route === 'GET /api/v1/health' && !SUMMARIES_ONLY) return send(res, 200, { status: 'ok' })
-
   const isSummary = route === 'POST /api/v1/summaries'
   const isQuiz = route === 'POST /api/v1/quizzes' && !SUMMARIES_ONLY
   if (!isSummary && !isQuiz) return sendError(res, 404, 'NOT_FOUND', 'Not found')
@@ -125,7 +124,7 @@ const server = http.createServer(async (req, res) => {
   const notes = body.notes.trim()
   await wait(isSummary ? DELAY_MS : DELAY_MS * 2)
 
-  if (notes.includes('[llm-error]')) {
+  if (notes.includes('[llm-error]') || (isQuiz && notes.includes('[quiz-error]'))) {
     const message = isSummary ? 'Could not generate a summary. Please try again.' : 'Could not generate a quiz. Please try again.'
     return sendError(res, 502, 'LLM_ERROR', message)
   }
@@ -134,12 +133,12 @@ const server = http.createServer(async (req, res) => {
 
   const questionCount = body.questionCount ?? 10
   if (!Number.isInteger(questionCount) || questionCount < 1 || questionCount > 20) {
-    return sendError(res, 400, 'VALIDATION_ERROR', 'questionCount must be an integer from 1 to 20')
+    return sendError(res, 400, 'VALIDATION_ERROR', 'questionCount must be an integer between 1 and 20')
   }
   return send(res, 200, { data: { questions: buildQuiz(notes, questionCount) } })
 })
 
 server.listen(PORT, () => {
   console.log(`Mock API listening on http://localhost:${PORT}/api/v1`)
-  console.log(SUMMARIES_ONLY ? 'Mode: summaries only (matches the backend today)' : 'Mode: all endpoints')
+  console.log(SUMMARIES_ONLY ? 'Mode: summaries only' : 'Mode: summaries and quizzes')
 })

@@ -1,12 +1,13 @@
-import { CircleCheck, CircleX, RotateCcw, Trophy } from 'lucide-react'
+import { BookText, CircleCheck, CircleX, FilePlus2, RotateCcw, Trophy } from 'lucide-react'
 import Button from '@/components/common/Button'
 import ProgressBar from '@/components/common/ProgressBar'
 
 interface QuizResultProps {
   score: number
   total: number
-  onRetry: () => void
+  onRetake: () => void
   onReviewSummary: () => void
+  onNewNotes: () => void
 }
 
 function getMessage(percent: number) {
@@ -16,7 +17,7 @@ function getMessage(percent: number) {
   return 'Keep going! Review the summary and give it another shot.'
 }
 
-function QuizResult({ score, total, onRetry, onReviewSummary }: QuizResultProps) {
+function QuizResult({ score, total, onRetake, onReviewSummary, onNewNotes }: QuizResultProps) {
   const percent = total > 0 ? Math.round((score / total) * 100) : 0
 
   return (
@@ -52,11 +53,16 @@ function QuizResult({ score, total, onRetry, onReviewSummary }: QuizResultProps)
       </ul>
 
       <div className="result-actions">
-        <Button variant="outline" onClick={onRetry}>
-          <RotateCcw size={16} /> Try Again
+        <Button variant="outline" onClick={onRetake}>
+          <RotateCcw size={16} /> Retake Quiz
         </Button>
-        <Button onClick={onReviewSummary}>Review Summary</Button>
+        <Button onClick={onReviewSummary}>
+          <BookText size={16} /> Review Summary
+        </Button>
       </div>
+      <Button variant="ghost" onClick={onNewNotes} className="result-new-notes">
+        <FilePlus2 size={16} /> Start with New Notes
+      </Button>
     </div>
   )
 }

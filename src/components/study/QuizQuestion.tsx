@@ -62,7 +62,7 @@ function QuizQuestion({
       <h3 className="quiz-question-text">{question.text}</h3>
 
       <div className="choices" role="radiogroup" aria-label="Answer choices">
-        {question.choices.map((choice) => {
+        {question.choices.map((choice, choiceIndex) => {
           const state = getChoiceState(choice.id, question, selectedChoiceId, answer)
           return (
             <button
@@ -76,7 +76,7 @@ function QuizQuestion({
             >
               <span className="choice-mark" aria-hidden="true" />
               <span className="choice-text">
-                {choice.id.toUpperCase()}. {choice.text}
+                {String.fromCharCode(65 + choiceIndex)}. {choice.text}
               </span>
               {state === 'correct' && <CircleCheck size={18} className="choice-status" />}
               {state === 'incorrect' && <CircleX size={18} className="choice-status" />}

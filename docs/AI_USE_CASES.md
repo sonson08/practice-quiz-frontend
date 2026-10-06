@@ -9,7 +9,7 @@ The backend (`node-express-js-prisma-psql-boilerplate`) defines the API contract
 | Endpoint | Backend | Frontend |
 |---|---|---|
 | `POST /api/v1/summaries` | Built (Claude 3 Haiku on AWS Bedrock) | **Integrated** (UC-01 to UC-03) |
-| `POST /api/v1/quizzes` | Documented, not built yet | Integrated; falls back to the browser mock while the backend returns 404 |
+| `POST /api/v1/quizzes` | Built (same model; may return fewer questions than requested for short notes) | **Integrated** (UC-04, UC-05); requests 5 questions. If only the quiz fails, the summary is still shown with a "Try Again" for the quiz |
 | `GET /api/v1/health` | Documented, not built yet | Not used |
 
 If `VITE_API_BASE_URL` is not set (for example on the current Vercel deployment), the whole study guide comes from the browser mock in `src/services/mockStudyGuide.ts`.
@@ -31,11 +31,11 @@ If `VITE_API_BASE_URL` is not set (for example on the current Vercel deployment)
 
 | ID | Use case | Status | Priority |
 |---|---|---|---|
-| UC-01 | Summarize notes | Mocked | Must have |
-| UC-02 | Extract key concepts | Mocked | Must have |
-| UC-03 | Extract important terms | Mocked | Must have |
-| UC-04 | Generate multiple-choice quiz | Mocked | Must have |
-| UC-05 | Explain answers | Mocked | Must have |
+| UC-01 | Summarize notes | Backend | Must have |
+| UC-02 | Extract key concepts | Backend | Must have |
+| UC-03 | Extract important terms | Backend | Must have |
+| UC-04 | Generate multiple-choice quiz | Backend | Must have |
+| UC-05 | Explain answers | Backend | Must have |
 | UC-06 | Validate and reject unusable notes | Partial | Must have |
 | UC-07 | Personalized review after the quiz | Planned | Should have |
 | UC-08 | Adjustable quiz difficulty and length | Planned | Could have |
@@ -148,7 +148,7 @@ The student does not choose a summary length. Every study guide uses the same st
 **Goal:** Let the student check their understanding of the notes.
 
 **Rules**
-- Exactly **5** questions (`QUIZ_QUESTION_COUNT`).
+- Up to **5** questions (`QUIZ_QUESTION_COUNT`). The backend may return fewer for short notes, and the UI adapts to any count.
 - Each question has exactly **4** choices with ids `a`, `b`, `c`, `d`.
 - Exactly one correct answer; its position should vary across questions.
 - Questions must be answerable from the notes alone.
