@@ -12,7 +12,9 @@ The backend (`node-express-js-prisma-psql-boilerplate`) defines the API contract
 | `POST /api/v1/quizzes` | Built (same model; may return fewer questions than requested for short notes) | **Integrated** (UC-04, UC-05); requests 5 questions. If only the quiz fails, the summary is still shown with a "Try Again" for the quiz |
 | `GET /api/v1/health` | Documented, not built yet | Not used |
 
-If `VITE_API_BASE_URL` is not set (for example on the current Vercel deployment), the whole study guide comes from the browser mock in `src/services/mockStudyGuide.ts`.
+The backend is deployed on Railway at `https://node-express-js-prisma-psql-boilerplate-production.up.railway.app`. On Vercel, `vercel.json` rewrites `/api/*` to it (same origin, so no CORS needed), and `.env.production` sets `VITE_API_BASE_URL=/api/v1`.
+
+If `VITE_API_BASE_URL` is not set, the whole study guide comes from the browser mock in `src/services/mockStudyGuide.ts`.
 
 **Field mapping** (backend → frontend):
 
