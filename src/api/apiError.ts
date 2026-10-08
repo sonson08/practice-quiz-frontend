@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios'
+import { INSUFFICIENT_NOTES_MESSAGE } from '@/constants/study'
 import type { ApiErrorBody } from '@/types/api'
 
 export class ApiError extends Error {
@@ -13,7 +14,10 @@ export class ApiError extends Error {
   }
 }
 
+export const insufficientNotesError = () => new ApiError(INSUFFICIENT_NOTES_MESSAGE, 'INSUFFICIENT_CONTENT')
+
 const FALLBACK_MESSAGES: Record<string, string> = {
+  INSUFFICIENT_CONTENT: INSUFFICIENT_NOTES_MESSAGE,
   LLM_ERROR: 'The AI could not process your notes. Please try again.',
   PAYLOAD_TOO_LARGE: 'Your notes are too long. Please shorten them and try again.',
   INTERNAL_ERROR: 'Something went wrong on the server. Please try again.',

@@ -1,10 +1,11 @@
 import { isApiConfigured } from '@/api/axiosClient'
-import { toApiError } from '@/api/apiError'
+import { insufficientNotesError, toApiError } from '@/api/apiError'
 import { studyGuideApi } from '@/api/studyGuideApi'
-import { LOADING_STEPS, QUIZ_QUESTION_COUNT } from '@/constants/study'
+import { LOADING_STEPS, MIN_NOTES_WORDS, QUIZ_QUESTION_COUNT } from '@/constants/study'
 import { buildMockQuestions, buildMockStudyGuide } from '@/services/mockStudyGuide'
 import type { Question } from '@/types/quiz'
 import type { StudyGuide } from '@/types/studyGuide'
+import { countWords } from '@/utils/countWords'
 import { wait } from '@/utils/wait'
 
 type ProgressHandler = (stepIndex: number) => void
@@ -45,7 +46,8 @@ async function generateWithApi(notes: string, onProgress?: ProgressHandler): Pro
   return { guide: { ...summary, questions }, quizError }
 }
 
-export function generateStudyGuide(notes: string, onProgress?: ProgressHandler): Promise<GenerateResult> {
+export async function generateStudyGuide(notes: string, onProgress?: ProgressHandler): Promise<GenerateResult> {
+  if (countWords(notes) < MIN_NOTES_WORDS) throw insufficientNotesError()
   return isApiConfigured ? generateWithApi(notes, onProgress) : generateWithMock(notes, onProgress)
 }
 

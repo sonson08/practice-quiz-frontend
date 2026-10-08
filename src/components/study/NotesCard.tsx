@@ -1,13 +1,16 @@
 import { FileText, Sparkles } from 'lucide-react'
 import Button from '@/components/common/Button'
 import Card from '@/components/common/Card'
-import { MAX_NOTES_LENGTH } from '@/constants/study'
+import { MAX_NOTES_LENGTH, MIN_NOTES_WORDS } from '@/constants/study'
 import { useStudySession } from '@/hooks/useStudySession'
+import { countWords } from '@/utils/countWords'
 
 function NotesCard() {
   const { notes, status, error, setNotes, generate } = useStudySession()
   const isLoading = status === 'loading'
-  const canGenerate = notes.trim().length > 0 && !isLoading
+  const wordCount = countWords(notes)
+  const hasEnoughWords = wordCount >= MIN_NOTES_WORDS
+  const canGenerate = hasEnoughWords && !isLoading
 
   return (
     <Card title="Your Notes" icon={<FileText size={18} />} className="notes-card">
@@ -23,9 +26,16 @@ function NotesCard() {
         onChange={(event) => setNotes(event.target.value)}
         disabled={isLoading}
       />
-      <p className="notes-counter">
-        {notes.length.toLocaleString()} / {MAX_NOTES_LENGTH.toLocaleString()}
-      </p>
+      <div className="notes-meta">
+        <p className="notes-hint">
+          {wordCount > 0 && !hasEnoughWords
+            ? `Add at least ${MIN_NOTES_WORDS - wordCount} more ${MIN_NOTES_WORDS - wordCount === 1 ? 'word' : 'words'} to generate.`
+            : ''}
+        </p>
+        <p className="notes-counter">
+          {notes.length.toLocaleString()} / {MAX_NOTES_LENGTH.toLocaleString()}
+        </p>
+      </div>
 
       {error && (
         <p className="form-error" role="alert">

@@ -193,6 +193,7 @@ The student does not choose a summary length. Every study guide uses the same st
 |---|---|
 | Empty notes | Button disabled in the UI; no request is sent. |
 | Over 20,000 characters | Blocked by the textarea limit. |
+| Fewer than 20 words (`MIN_NOTES_WORDS`) | **Frontend:** button disabled with a hint ("Add at least N more words to generate."); no request is sent. |
 | Too short to quiz on (e.g. one sentence) | Return a clear error: "Your notes are too short to create a quiz. Add a bit more detail." |
 | Not study material (random text, code dump, shopping list) | Return an error asking for lesson or study notes. |
 | Harmful or inappropriate content | Refuse with a polite error; do not generate a quiz. |
@@ -200,7 +201,16 @@ The student does not choose a summary length. Every study guide uses the same st
 | AI returns invalid or incomplete JSON | Backend retries once, then returns an error. The UI shows "Something went wrong while generating. Please try again." |
 | Request takes too long (over 30 seconds) | Backend times out and returns an error. |
 
-**Note:** the current mock falls back to a sample photosynthesis quiz for very short notes. The real backend should return an error instead.
+The app never invents content when the notes can't be understood. It shows this error on the notes step instead: "We couldn't find enough study content in your notes. Please add more details about the topic and try again."
+
+**Current behavior:**
+
+- **Frontend:** notes under 20 words are blocked before any request. The browser mock shows the error instead of a sample guide.
+- **Backend (not done yet):** it accepts any non-empty notes, and Claude still writes a summary and quiz for meaningless input. For example, 20 repetitions of "asdf jkl qwer zxcv" return a summary saying the notes have "no coherent academic or informational content", plus key points, terms, and a quiz. The frontend can't reliably detect this from the response, so the backend should:
+  - reject notes under 20 words with `400 VALIDATION_ERROR`;
+  - have the prompt return `{ "error": "..." }` for notes that aren't study material (see the prompt template below) and turn that into `422 INSUFFICIENT_CONTENT`.
+
+  The frontend already displays any backend error message on the notes step.
 
 ---
 

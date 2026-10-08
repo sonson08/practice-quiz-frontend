@@ -1,10 +1,10 @@
+import { insufficientNotesError } from '@/api/apiError'
 import { QUIZ_QUESTION_COUNT } from '@/constants/study'
 import type { Question } from '@/types/quiz'
 import type { StudyGuide } from '@/types/studyGuide'
 import { shuffle } from '@/utils/shuffle'
 
-// Browser-only stand-in for the backend AI. Used when VITE_API_BASE_URL is not set,
-// and for the quiz until the backend's /quizzes endpoint exists.
+// Browser-only stand-in for the backend AI. Used when VITE_API_BASE_URL is not set.
 
 const SUMMARY_SENTENCE_COUNT = 3
 const KEY_CONCEPT_COUNT = 4
@@ -32,81 +32,6 @@ const GENERIC_DISTRACTORS = [
   'Friction',
   'Mitosis',
 ]
-
-const SAMPLE_GUIDE: StudyGuide = {
-  summary: [
-    'Photosynthesis is the process plants use to convert light energy into chemical energy stored in glucose.',
-    'It takes place in the chloroplasts and requires sunlight, water, and carbon dioxide, releasing oxygen as a by-product.',
-  ],
-  keyConcepts: [
-    'Sunlight is the primary energy source for photosynthesis',
-    'Chlorophyll absorbs light inside the chloroplasts',
-    'Glucose stores the chemical energy produced',
-  ],
-  importantTerms: ['Photosynthesis', 'Chlorophyll', 'Chloroplast', 'Glucose', 'Carbon Dioxide'],
-  questions: [
-    {
-      id: 'sample-1',
-      text: 'What is the primary energy source for photosynthesis?',
-      choices: [
-        { id: 'a', text: 'Water' },
-        { id: 'b', text: 'Sunlight' },
-        { id: 'c', text: 'Carbon Dioxide' },
-        { id: 'd', text: 'Glucose' },
-      ],
-      correctChoiceId: 'b',
-      explanation: 'Sunlight provides the energy needed to drive the photosynthesis process.',
-    },
-    {
-      id: 'sample-2',
-      text: 'Where in the plant cell does photosynthesis take place?',
-      choices: [
-        { id: 'a', text: 'Nucleus' },
-        { id: 'b', text: 'Mitochondria' },
-        { id: 'c', text: 'Chloroplast' },
-        { id: 'd', text: 'Cell wall' },
-      ],
-      correctChoiceId: 'c',
-      explanation: 'Chloroplasts contain chlorophyll, which captures light for photosynthesis.',
-    },
-    {
-      id: 'sample-3',
-      text: 'Which gas is released as a by-product of photosynthesis?',
-      choices: [
-        { id: 'a', text: 'Oxygen' },
-        { id: 'b', text: 'Nitrogen' },
-        { id: 'c', text: 'Carbon Dioxide' },
-        { id: 'd', text: 'Hydrogen' },
-      ],
-      correctChoiceId: 'a',
-      explanation: 'Plants release oxygen after splitting water molecules during photosynthesis.',
-    },
-    {
-      id: 'sample-4',
-      text: 'Which pigment absorbs light energy in plants?',
-      choices: [
-        { id: 'a', text: 'Melanin' },
-        { id: 'b', text: 'Hemoglobin' },
-        { id: 'c', text: 'Keratin' },
-        { id: 'd', text: 'Chlorophyll' },
-      ],
-      correctChoiceId: 'd',
-      explanation: 'Chlorophyll is the green pigment that absorbs light energy.',
-    },
-    {
-      id: 'sample-5',
-      text: 'What sugar is produced by photosynthesis?',
-      choices: [
-        { id: 'a', text: 'Sucrose' },
-        { id: 'b', text: 'Glucose' },
-        { id: 'c', text: 'Lactose' },
-        { id: 'd', text: 'Fructose' },
-      ],
-      correctChoiceId: 'b',
-      explanation: 'Photosynthesis produces glucose, which stores chemical energy for the plant.',
-    },
-  ],
-}
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
@@ -225,14 +150,15 @@ const hasEnoughContent = (sentences: string[], terms: string[]) => sentences.len
 export function buildMockQuestions(notes: string): Question[] {
   const sentences = splitSentences(notes)
   const terms = extractTerms(notes)
-  return hasEnoughContent(sentences, terms) ? buildQuestions(sentences, terms) : SAMPLE_GUIDE.questions
+  if (!hasEnoughContent(sentences, terms)) throw insufficientNotesError()
+  return buildQuestions(sentences, terms)
 }
 
 export function buildMockStudyGuide(notes: string): StudyGuide {
   const sentences = splitSentences(notes)
   const terms = extractTerms(notes)
 
-  if (!hasEnoughContent(sentences, terms)) return SAMPLE_GUIDE
+  if (!hasEnoughContent(sentences, terms)) throw insufficientNotesError()
 
   const summary = pickTopSentences(sentences, terms, SUMMARY_SENTENCE_COUNT)
   const keyConcepts = pickTopSentences(
